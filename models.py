@@ -43,7 +43,7 @@ def create_xgboost_config():
         },
         fixed_params={"random_state": 42, "n_jobs": -1},
         model_name="XGBoost",
-        mlflow_log_model_func=mlflow.xgboost.log_model,
+        # mlflow_log_model_func=mlflow.xgboost.log_model,
     )
 
 

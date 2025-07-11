@@ -56,7 +56,7 @@ class Experiment:
         self.scaler = StandardScaler()
         self.best_model = None
         self.best_params = None
-        self.experiment_name = f"{model_config.model_name}_MultiOutput_Experiment"
+        self.experiment_name = f"{model_config.model_name}_Experiment"
 
     def load_and_preprocess_data(self):
         """Load CSV data and perform preprocessing"""
@@ -308,7 +308,7 @@ class Experiment:
 
         plt.tight_layout()
         plt.savefig("feature_importance.png", dpi=300, bbox_inches="tight")
-        plt.show()
+        # plt.show()
 
     def plot_results(self):
         """Plot training results and predictions"""
@@ -357,7 +357,7 @@ class Experiment:
 
         plt.tight_layout()
         plt.savefig("results_comparison.png", dpi=300, bbox_inches="tight")
-        plt.show()
+        # plt.show()
 
     def plot_mape_comparison(self):
         """Plot MAPE comparison across train/val/test sets and individual targets"""
@@ -413,7 +413,7 @@ class Experiment:
 
         plt.tight_layout()
         plt.savefig("mape_comparison.png", dpi=300, bbox_inches="tight")
-        plt.show()
+        # plt.show()
 
     def run_experiment(self, n_trials: int = 100):
         """Run the complete experiment pipeline"""
@@ -446,6 +446,48 @@ class Experiment:
             "study": study,
         }
 
+    def predict_and_save_submission(self):
+        """
+        Predict on test.csv using the best model and save the submission file.
+        """
+        print("Predicting on test.csv and saving submission...")
+
+        # Load test data
+        try:
+            test_data = pd.read_csv("./data/test.csv")
+        except FileNotFoundError:
+            print(
+                "Error: test.csv not found. Please ensure it is in the ./data/ directory."
+            )
+            return
+
+        # Preprocess test data (handle missing values and select numeric columns)
+        numeric_columns = test_data.select_dtypes(include=[np.number]).columns
+        # numeric_columns.delete(0)
+        X_test_submission = test_data[numeric_columns]
+        X_test_submission.drop(columns=["ID"], inplace=True)
+        X_test_submission = X_test_submission.fillna(
+            X_test_submission.mean()
+        )  # Impute missing values if any
+
+        # Scale features
+        X_test_submission_scaled = self.scaler.transform(X_test_submission)
+
+        # Predict using the best model
+        predictions = self.best_model.predict(X_test_submission_scaled)
+
+        # Create submission dataframe
+        submission_df = pd.DataFrame(
+            predictions, columns=self.target_columns
+        )  # Use target columns
+        submission_df.insert(0, "ID", test_data["ID"])  # Add ID column
+
+        # Save submission file
+        submission_df.to_csv("submission.csv", index=False)
+        print(
+            f"Submission file 'submission.csv' created with predictions for {len(self.target_columns)} targets."
+        )
+
 
 # Example usage
 if __name__ == "__main__":
@@ -454,7 +496,9 @@ if __name__ == "__main__":
 
     # Example configuration - modify these according to your data
     CSV_FILE_PATH = "./data/train.csv"  # Replace with your CSV file path
-    TARGET_COLUMNS = ["target1", "target2"]  # Replace with your target column names
+    TARGET_COLUMNS = [
+        f"BlendProperty{i+1}" for i in range(10)
+    ]  # Replace with your target column names
 
     with open("config.yaml", "r") as f:
         config = yaml.safe_load(f)
@@ -489,3 +533,6 @@ if __name__ == "__main__":
     print(f"Best Parameters: {results['best_params']}")
     print(f"Test MAPE: {results['test_mape']:.4f}")
     print(f"Individual Target MAPE: {results['individual_mape']}")
+
+    # Generate and save submission file
+    experiment.predict_and_save_submission()

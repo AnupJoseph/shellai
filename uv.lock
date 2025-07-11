@@ -849,6 +849,23 @@ wheels = [
 ]
 
 [[package]]
+name = "optuna-integration"
+version = "4.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "optuna" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c9/8f/30f37bc7d92ed13cc453a23709608f2dd9f5ae85409b537ad2e24fa4f316/optuna_integration-4.4.0.tar.gz", hash = "sha256:edc1878f9ac8fadc1267708c1c134ae95ce92ded514b11eb34d4911dbb5cf5d3", size = 86293 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ee/6c/b42eec83c066377329f48c250bb80dc00f91c29b200945fcf17953722875/optuna_integration-4.4.0-py3-none-any.whl", hash = "sha256:f698c1e2ad56d4959fc96f50c94ca5c02e5c56b9edd173dedc805a5a50c5069e", size = 98886 },
+]
+
+[package.optional-dependencies]
+mlflow = [
+    { name = "mlflow" },
+]
+
+[[package]]
 name = "packaging"
 version = "25.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1352,6 +1369,7 @@ dependencies = [
     { name = "mlflow" },
     { name = "numpy" },
     { name = "optuna" },
+    { name = "optuna-integration", extra = ["mlflow"] },
     { name = "pandas" },
     { name = "scikit-learn" },
     { name = "seaborn" },
@@ -1364,6 +1382,7 @@ requires-dist = [
     { name = "mlflow", specifier = ">=3.1.1" },
     { name = "numpy", specifier = ">=2.3.1" },
     { name = "optuna", specifier = ">=4.4.0" },
+    { name = "optuna-integration", extras = ["mlflow"], specifier = ">=4.4.0" },
     { name = "pandas", specifier = ">=2.3.1" },
     { name = "scikit-learn", specifier = ">=1.7.0" },
     { name = "seaborn", specifier = ">=0.13.2" },
