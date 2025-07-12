@@ -26,20 +26,45 @@ class ModelConfig:
 # Model configuration factory functions
 def create_xgboost_config():
     """Create XGBoost model configuration"""
+    tree_method = ["approx", "hist"]
+    boosting_list = ["gbtree", "gblinear"]
     return ModelConfig(
         model_class=xgb.XGBRegressor,
         param_space={
-            "n_estimators": lambda trial: trial.suggest_int("n_estimators", 100, 1000),
-            "max_depth": lambda trial: trial.suggest_int("max_depth", 3, 10),
-            "learning_rate": lambda trial: trial.suggest_float(
-                "learning_rate", 0.01, 0.3
+            "boosting": lambda trial: trial.suggest_categorical(
+                "boosting", boosting_list
             ),
-            "subsample": lambda trial: trial.suggest_float("subsample", 0.6, 1.0),
-            "colsample_bytree": lambda trial: trial.suggest_float(
-                "colsample_bytree", 0.6, 1.0
+            "tree_method": lambda trial: trial.suggest_categorical(
+                "tree_method", tree_method
             ),
-            "reg_alpha": lambda trial: trial.suggest_float("reg_alpha", 0, 10),
-            "reg_lambda": lambda trial: trial.suggest_float("reg_lambda", 0, 10),
+            "max_depth": lambda trial: trial.suggest_int("max_depth", 2, 25),
+            "reg_alpha": lambda trial: trial.suggest_int("reg_alpha", 0, 5),
+            "reg_lambda": lambda trial: trial.suggest_int("reg_lambda", 0, 5),
+            "min_child_weight": lambda trial: trial.suggest_int(
+                "min_child_weight", 0, 5
+            ),
+            "gamma": lambda trial: trial.suggest_int("gamma", 0, 5),
+            "learning_rate": lambda trial: trial.suggest_loguniform(
+                "learning_rate", 0.005, 0.5
+            ),
+            # "eval_metric": lambda trial: trial.suggest_categorical(
+            #     "eval_metric", metric_list
+            # ),
+            # "objective": lambda trial: trial.suggest_categorical(
+            #     "objective", objective_list_reg
+            # ),
+            "colsample_bytree": lambda trial: trial.suggest_discrete_uniform(
+                "colsample_bytree", 0.1, 1, 0.01
+            ),
+            "colsample_bynode": lambda trial: trial.suggest_discrete_uniform(
+                "colsample_bynode", 0.1, 1, 0.01
+            ),
+            "colsample_bylevel": lambda trial: trial.suggest_discrete_uniform(
+                "colsample_bylevel", 0.1, 1, 0.01
+            ),
+            "subsample": lambda trial: trial.suggest_discrete_uniform(
+                "subsample", 0.5, 1, 0.05
+            ),
         },
         fixed_params={"random_state": 42, "n_jobs": -1},
         model_name="XGBoost",

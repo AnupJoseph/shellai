@@ -181,7 +181,7 @@ class Experiment:
         return study
 
     def train_best_model(self):
-        """Train the best model with optimized parameters"""
+        """Train the best model with optimized parameters on the training data"""
         print("Training best model...")
 
         # Create best model
@@ -215,6 +215,21 @@ class Experiment:
         for target, mape in self.individual_mape.items():
             print(f"  {target}: {mape:.4f}")
 
+    def train_final_model(self):
+        """Train the final model on the entire dataset using the best parameters."""
+        print("Training final model on the entire dataset...")
+
+        # Create the best model
+        base_model = self.model_config.model_class(**self.best_params)
+        self.final_model = MultiOutputRegressor(base_model)
+
+        # Scale the entire dataset
+        X_scaled = self.scaler.fit_transform(self.X)
+
+        # Train on the entire scaled dataset
+        self.final_model.fit(X_scaled, self.y)
+        print("Final model training complete.")
+
     def log_to_mlflow(self):
         """Log the best model and metrics to MLflow"""
         print("Logging to MLflow...")
@@ -222,6 +237,12 @@ class Experiment:
         with mlflow.start_run(
             run_name=f"Best_{self.model_config.model_name}_MultiOutput"
         ):
+            # Log the final model if trained on the entire dataset
+            if hasattr(self, "final_model"):
+                mlflow.sklearn.log_model(self.final_model, "final_multi_output_model")
+                print("Final model logged to MLflow.")
+            else:
+                print("Final model not trained, skipping MLflow logging.")
             # Log parameters
             mlflow.log_params(self.best_params)
             mlflow.log_param("model_type", self.model_config.model_name)
@@ -430,6 +451,9 @@ class Experiment:
         # Train best model
         self.train_best_model()
 
+        # Train final model on entire dataset
+        self.train_final_model()
+
         # Log to MLflow
         self.log_to_mlflow()
 
@@ -474,7 +498,7 @@ class Experiment:
         X_test_submission_scaled = self.scaler.transform(X_test_submission)
 
         # Predict using the best model
-        predictions = self.best_model.predict(X_test_submission_scaled)
+        predictions = self.final_model.predict(X_test_submission_scaled)
 
         # Create submission dataframe
         submission_df = pd.DataFrame(

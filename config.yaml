@@ -8,7 +8,7 @@ data_config:
 
 model_config:
   model_name: "xgboost"  # Options: "xgboost", "random_forest", "ridge"
-  n_trials: 30  # Number of Optuna trials
+  n_trials: 50  # Number of Optuna trials
 
 mlflow_config:
   tracking_uri: "mlruns" # Local MLflow tracking
