@@ -452,7 +452,7 @@ class Experiment:
         self.train_best_model()
 
         # Train final model on entire dataset
-        self.train_final_model()
+        # self.train_final_model()
 
         # Log to MLflow
         self.log_to_mlflow()
@@ -498,7 +498,7 @@ class Experiment:
         X_test_submission_scaled = self.scaler.transform(X_test_submission)
 
         # Predict using the best model
-        predictions = self.final_model.predict(X_test_submission_scaled)
+        predictions = self.best_model.predict(X_test_submission_scaled)
 
         # Create submission dataframe
         submission_df = pd.DataFrame(

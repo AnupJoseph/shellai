@@ -2,13 +2,13 @@
 
 data_config:
   csv_file_path: "./data/train.csv"  # Replace with your CSV file path
-  test_size: 0.2
+  test_size: 0.1
   val_size: 0.2
   random_state: 42
 
 model_config:
   model_name: "xgboost"  # Options: "xgboost", "random_forest", "ridge"
-  n_trials: 50  # Number of Optuna trials
+  n_trials: 100  # Number of Optuna trials
 
 mlflow_config:
   tracking_uri: "mlruns" # Local MLflow tracking
