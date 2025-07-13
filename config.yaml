@@ -2,7 +2,7 @@
 
 data_config:
   csv_file_path: "./data/train.csv"  # Replace with your CSV file path
-  test_size: 0.1
+  test_size: 0.2
   val_size: 0.2
   random_state: 42
 
